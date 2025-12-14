@@ -39,19 +39,19 @@ func main() {
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	clientIP, port, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		http.Error(w, "Невозможно определить IP клиента", http.StatusInternalServerError)
+		http.Error(w, "IP missed", http.StatusInternalServerError)
 		return
 	}
 
 	ticket := r.URL.Query().Get("ticket")
 	if ticket == "" {
-		http.Error(w, "Ticket не указан", http.StatusBadRequest)
+		http.Error(w, "Ticket missed", http.StatusBadRequest)
 		return
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("Ошибка при апгрейде соединения:", err)
+		log.Println("Upgrade error", err)
 		return
 	}
 	defer conn.Close()
@@ -61,7 +61,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	expectedIP := ticketData.Ipaddr
 
 	if os.Getenv("APP_ENV") == "prod" && clientIP != expectedIP {
-		http.Error(w, "IP адрес не совпадает", http.StatusForbidden)
+		http.Error(w, "IP addresses not equals", http.StatusForbidden)
 		return
 	}
 
@@ -72,7 +72,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
-			log.Printf("Клиент отключился: %v", err)
+			log.Printf("Client disconnect: %v", err)
 			connect_storage.DeleteConn(ipPort)
 			break
 		}
@@ -87,15 +87,15 @@ func pingPongHandler(conn *websocket.Conn, ipPort string) {
 		select {
 		case <-ticker.C:
 			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				log.Println("Ошибка отправки пинга:", err)
+				log.Println("Ping sending error:", err)
 				connect_storage.DeleteConn(ipPort)
 				conn.Close()
 				return
 			}
-			log.Println("Пинг отправлен")
+			log.Println("Ping sended")
 
 			conn.SetPongHandler(func(appData string) error {
-				log.Println("Получен понг")
+				log.Println("Pong received")
 				return nil
 			})
 		}

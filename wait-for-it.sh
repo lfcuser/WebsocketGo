@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-    echo "Использование: $0 <URL>"
+    echo "Using: $0 <URL>"
     exit 1
 fi
 
@@ -11,7 +11,7 @@ while true; do
     HTTP_CODE=$(curl --write-out "%{http_code}" --silent --output /dev/null "$URL")
 
     if [ "$HTTP_CODE" -eq 200 ]; then
-        echo "Сайт доступен: $URL"
+        echo "Available: $URL"
         break
     fi
     sleep 5

@@ -1,30 +1,33 @@
-# DockerGo
+# WebsocketGo
 
-# Запуск
+# Run
 1. make env
 2. sudo make up || sudo make compose
 
-# Описание?
+## Auth
 
-## Аутентификация
+The client authenticates with System X and receives a ticket.
+System X stores a pair of values: ticket–IP address.
+The client then sends a request to connect to the WebSocket server at
+ws://localhost:6060/ws?ticket=<ticket>.
 
-Клиент обращается к системе X, в которой он авторизован, получает ticket. Система X хранит у себя пару значений "тикет"-"айпи". Клиент делает запрос на подключение к вебсокет серверу ws://localhost:6060/ws?ticket=ticket. Вебсокет сервер обращается к системе X проверяет валидность ticket и сравнивает айпи.
+The WebSocket server contacts System X to validate the ticket and verify that the IP address matches.
 
-## Сообщения
+## Messeges
 
-Сообщения от сервера для клиентов получаются из очереди RabbitMQ output в виде
+Messeges from server for clients by queue RabbitMQ output:
 ```
 {
     mode: [
         all // all connected
         touser // userid requered
-        group // message for specific connected group - @ToDo
+        group // message for specific connected group
     ]
     userid: string // optional, required if mode is touser
     message: string // data for websocket client
 }
 ```
-## Примеры
+## Example
 ```
 {
     "mode": "touser",

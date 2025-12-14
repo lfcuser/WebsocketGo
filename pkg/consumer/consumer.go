@@ -31,7 +31,7 @@ func Consume() {
 		rabbitmq.WithConnectionOptionsLogging,
 	)
 	if err != nil {
-		log.Fatalf("Ошибка плдключения: %v", err)
+		log.Fatalf("Connect error: %v", err)
 	}
 	defer conn.Close()
 
@@ -40,7 +40,7 @@ func Consume() {
 		queue,
 	)
 	if err != nil {
-		log.Fatalf("Ошибка создания потребителя: %v", err)
+		log.Fatalf("Consumer creation error: %v", err)
 	}
 
 	err = consumer.Run(func(d rabbitmq.Delivery) rabbitmq.Action {
